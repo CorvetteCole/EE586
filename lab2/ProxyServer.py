@@ -32,15 +32,18 @@ while True:
         print(f'Fetching {filename} from web server...')
         # connect to web server running on localhost on port 6789
         serverSocket = socket(AF_INET, SOCK_STREAM)
-        serverSocket.connect(('localhost', 6789))
+        serverSocket.connect(('server', 6789))
         serverSocket.send(message)
-        response = serverSocket.recv(1024)
-        print(f'Received response from web server for {filename}')
-        connectionSocket.send(response)
+        responseHeader = serverSocket.recv(1024)
+        connectionSocket.send(responseHeader)
+        print(f'Received response header from web server for {filename}')
         # if the response was a 200 OK, cache the file
-        if response.split()[1] == b'200':
+        if responseHeader.split()[1] == b'200':
+            response = serverSocket.recv(1024)
+            connectionSocket.send(response)
             with open(CACHE_DIR / filename, 'wb') as f:
                 print(f'Caching {filename}...')
                 f.write(response)
+
     connectionSocket.close()
 
