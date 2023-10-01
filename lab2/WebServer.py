@@ -27,12 +27,14 @@ try:
 
             # Extract the path of the requested object from the message
             # The path is the second part of HTTP header, identified by [1]
-            filename = message.split()[1]
+            filename = message.split()[1][1:].decode()
+
+            print(f'Received request for {filename}')
 
             # Because the extracted path of the HTTP request includes
             # a character '\', we read the path from the second character
-            with open(filename[1:], 'rb') as f:
-                print(f'Serving {filename[1:]}')
+            with open(filename, 'rb') as f:
+                print(f'Serving {filename}')
                 # Send the HTTP response header line to the connection socket
                 connectionSocket.send("HTTP/1.1 200 OK\r\n\r\n".encode())
                 # send the file content to the client
